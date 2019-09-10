@@ -1,13 +1,11 @@
 package tab_Handling;
 
-import java.awt.AWTException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -16,11 +14,11 @@ import utils.DriverCreation;
 
 public class Switch_by_Iterator extends DriverCreation
 {
-	public static void main(String[] args) throws AWTException
+	public static void main(String[] args)
 	{
 		DriverCreation DC = new DriverCreation();
 		
-		WebDriver D = DC.driver("ie");
+		WebDriver D = DC.driver("firefox");
 		
 		//Wait statement
 		D.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -30,8 +28,8 @@ public class Switch_by_Iterator extends DriverCreation
 		D.get("http://www.naukri.com/mnjuser/homepage");
 		
 		//Login to user acount
-		//W.until(ExpectedConditions.presenceOfElementLocated(By.id("usernameField")));
-		D.findElement(By.cssSelector("#usernameField")).sendKeys("arpitnandi1@gmail.com");
+		W.until(ExpectedConditions.elementToBeClickable(By.id("usernameField")));
+		D.findElement(By.id("usernameField")).sendKeys("arpitnandi1@gmail.com");
 		
 		W.until(ExpectedConditions.elementToBeClickable(By.id("passwordField")));
 		D.findElement(By.id("passwordField")).sendKeys("#Diya@11");
@@ -43,7 +41,6 @@ public class Switch_by_Iterator extends DriverCreation
 		for(int i = 0 ; i < 5 ; i++)
 		{
 			W.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='topIcon notify']")));
-			//D.findElement(By.xpath("//div[@class='topIcon notify']")).click();
 			Actions A = new Actions(D);
 			A.moveToElement(D.findElement(By.xpath("//div[@class='topIcon notify']"))).build().perform();
 			W.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Job Recommendations']")));

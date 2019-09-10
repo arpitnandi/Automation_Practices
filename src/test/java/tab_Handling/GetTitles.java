@@ -1,25 +1,29 @@
 package tab_Handling;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class GetTitles 
+import utils.DriverCreation;
+import utils.Methods;
+
+public class GetTitles extends DriverCreation
 {
-	public static void main(String[] args) 
+	public static void main(String[] args) throws InterruptedException 
 	{	
-		System.setProperty("webdriver.gecko.driver", "C:\\Eclps_Projects\\Browser-Drivers\\geckodriver.exe");
-		WebDriver D = new FirefoxDriver();
+		DriverCreation DC = new DriverCreation();
+		
+		WebDriver D = DC.driver("firefox");
 		
 		//Wait statement
 		D.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		WebDriverWait W = new WebDriverWait(D,10);
+		WebDriverWait W = new WebDriverWait(D,17);
 		
 		//Load "Naukri" app
 		D.get("https://www.naukri.com/mnjuser/homepage");
@@ -34,25 +38,29 @@ public class GetTitles
 		W.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[text()='Login']")));
 		D.findElement(By.xpath("//button[text()='Login']")).click();
 		
-		//Click on to "Job Recommendations" 5 times in each last window
+		//Click on to "Job Recommendations" 5 times from first window
 		for(int i = 0 ; i < 5 ; i++)
 		{
 			W.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='topIcon notify']")));
-			D.findElement(By.xpath("//div[@class='topIcon notify']")).click();
-			W.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Job Recommendations']")));
+			Actions A = new Actions(D);
+			A.moveToElement(D.findElement(By.xpath("//div[@class='topIcon notify']"))).build().perform();
+			//W.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Job Recommendations']")));
 			D.findElement(By.xpath("//span[text()='Job Recommendations']")).click();
 		}
 		
 		//Geting session ID's of opened Windows
 		Set<String> Windows = D.getWindowHandles();
-		Iterator I = Windows.iterator();
+		ArrayList<String> IDs = new ArrayList<String>(Windows);
 		
 		//Switching between old to new window
-		for(int i = 0 ; i < Windows.size() ; i++)
+		for(int i = 0 ; i < IDs.size() ; i++)
 		{
-			D.switchTo().window(I.next().toString());
-			D.getTitle();
+			D.switchTo().window(IDs.get(i));
+			Methods M = new Methods();
+			M.waitForPageLoaded();
+			System.out.println(D.getTitle());
+			D.close();
+			//}while(PageLoad.equals("complete"));
 		}
-		
 	}
 }

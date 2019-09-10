@@ -7,7 +7,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 
 public class DriverCreation 
 {
-	private WebDriver D = null;
+	protected WebDriver D = null;
 
 	public WebDriver driver(String Browser)
 	{

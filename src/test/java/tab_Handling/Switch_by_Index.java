@@ -2,7 +2,6 @@ package tab_Handling;
 
 import java.awt.AWTException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +51,7 @@ public class Switch_by_Index
 			
 		//Geting session ID's of opened Windows
 		Set<String> Windows = D.getWindowHandles();
-		ArrayList<String> IDs = new ArrayList(Windows);
+		ArrayList<String> IDs = new ArrayList<String>(Windows);
 			
 		//Switching between old to new window
 		for(int i = IDs.size()-1 ; i >= 0 ; i--)
