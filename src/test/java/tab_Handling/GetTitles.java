@@ -60,7 +60,6 @@ public class GetTitles extends DriverCreation
 			M.waitForPageLoaded();
 			System.out.println(D.getTitle());
 			D.close();
-			//}while(PageLoad.equals("complete"));
 		}
 	}
 }
