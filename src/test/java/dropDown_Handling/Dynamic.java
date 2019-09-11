@@ -24,15 +24,16 @@ public class Dynamic extends DriverCreation
 		
 		driver.get("https://www.google.co.in/");
 		
-		String search = "seLenium";
+		String search = "java";
 		
 		driver.findElement(By.xpath("//input[@title='Search']")).sendKeys(search);
 		
-		ArrayList<WebElement> Sugestions = (ArrayList<WebElement>) driver.findElements(By.xpath("//ul[@role='listbox']/li[*]/div[1]/div[2]/div[1]/span[1]/b"));
+		String xpath = "//div[1]/div[2]/div[1]/span[1]/b";
+		ArrayList<WebElement> Sugestions = (ArrayList<WebElement>) driver.findElements(By.xpath(xpath));
 		
 		for(int i = 2 ; i <= Sugestions.size() ; i++ )
 		{
-			WebElement Value = driver.findElement(By.xpath("//ul[@role='listbox']/li["+i+"]/div[1]/div[2]/div[1]/span[1]/b"));
+			WebElement Value = driver.findElement(By.xpath("//ul[@role='listbox']/li["+i+"]"+xpath));
 			System.out.println(search+Value.getText());
 		}
 		
