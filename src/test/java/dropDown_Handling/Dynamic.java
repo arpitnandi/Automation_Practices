@@ -3,7 +3,7 @@ package dropDown_Handling;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,7 +14,6 @@ import utils.DriverCreation;
 
 public class Dynamic extends DriverCreation
 {
-	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws InterruptedException
 	{
 		DriverCreation DC = new DriverCreation();
