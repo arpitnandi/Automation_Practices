@@ -4,8 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.JavascriptExecutor;
@@ -37,18 +36,19 @@ public class Methods extends DriverCreation
         }
     }
 	
-	public static void writeData( String Value, String File, String Page, String Sheet, int row, int column) throws EncryptedDocumentException, IOException 
+	public static void writeData( String Value, String Path, String Name, String Sheet, int row, int column) throws  IOException, EncryptedDocumentException, InvalidFormatException 
 	{
-		FileOutputStream FO = new FileOutputStream(File+Page.replace(' ','_')+".xlsx");
-		XSSFWorkbook W = new XSSFWorkbook();
-		XSSFSheet S = W.createSheet(Sheet);
+		FileOutputStream FO = new FileOutputStream(Path+Name+".xlsx");		
 		
-		Row R = S.createRow(row);
-		Cell C = R.createCell(column);
-		C.setCellValue(Value);
-
+		XSSFWorkbook W = new XSSFWorkbook();
+		W.createSheet(Sheet);
+		
+		XSSFSheet S = W.getSheet(Sheet);
+		S.createRow(row).createCell(column).setCellValue(Value);
+		
 		W.write(FO);
 		W.close();
+		FO.flush();
 		FO.close();
 	}
 }

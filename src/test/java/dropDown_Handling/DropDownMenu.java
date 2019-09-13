@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,16 +21,16 @@ public class DropDownMenu extends DriverCreation
 	DriverCreation DC = new DriverCreation();
 	static WebDriver driver;
 	
-	public static void main(String[] args) throws InterruptedException, EncryptedDocumentException, IOException 
+	public static void main(String[] args) throws InterruptedException, IOException, EncryptedDocumentException, InvalidFormatException 
 	{
 		DriverCreation DC = new DriverCreation();
-		driver = DC.driver("chrome");
+		driver = DC.driver("firefox");
 
 		driver.manage().window().maximize();
 		driver.get( "https://www.urbanladder.com/" );
 		
-		String Page = driver.getTitle();
-		String File  = "C:\\Users\\Arpith\\Desktop\\Arpit\\";
+		//String Page = driver.getTitle();
+		String Path  = ".\\target\\";
 		
 		driver.manage().timeouts().implicitlyWait(20,TimeUnit.SECONDS);
 		WebDriverWait W = new WebDriverWait( driver, 20 );
@@ -84,17 +85,18 @@ public class DropDownMenu extends DriverCreation
 
 				// Gathering all items as WebElements -> present inside each list one-by-one -> present inside each dropdown menu
 				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "li", "li["+ i +"]" ) + "/.." + ListItemsPath.replace( "[j]", "["+ j +"]" ) ) );
+
 				
 				// Printing all items -> present inside each list -> present inside each dropdown menu as Coloumn values  as Coloumn
 				for( int k = 0 ; k < ListItems.size()-1 ; k++ )
 				{
-					System.out.print( ListItems.get( k ).getText() + "," );
-					Methods.writeData( ListItems.get( k ).getText(), File, Page, Menu.getText(), (k+1) , (j-1) );
+					System.out.print( ( ListItems.get( k ).getText() + "," ) );
+					Methods.writeData( ListItems.get( k ).getText(), Path, Menu.getText(), "Furniture", (k+1) , (j-1) );
 				}
 				
 				// Printing the last item -> present inside each list -> present inside each dropdown menu
 				System.out.println( ListItems.get( ListItems.size()-1 ).getText() + "]" );
-				Methods.writeData( ListItems.get( ListItems.size()-1 ).getText(), File, Page, Menu.getText(), ( ListItems.size() ) , (j-1) );
+				Methods.writeData( ListItems.get( ListItems.size()-1 ).getText(), Path, Menu.getText(), "Furniture", ( ListItems.size() ) , (j-1) );
 			}
 		}
 		
