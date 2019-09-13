@@ -1,8 +1,10 @@
 package dropDown_Handling;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.poi.EncryptedDocumentException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,20 +13,23 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import utils.DriverCreation;
+import utils.Methods;
 
 public class DropDownMenu extends DriverCreation
 {
-
 	DriverCreation DC = new DriverCreation();
 	static WebDriver driver;
 	
-	public static void main(String[] args) throws InterruptedException 
+	public static void main(String[] args) throws InterruptedException, EncryptedDocumentException, IOException 
 	{
 		DriverCreation DC = new DriverCreation();
 		driver = DC.driver("chrome");
-		
-		driver.get( "https://www.urbanladder.com/" );
+
 		driver.manage().window().maximize();
+		driver.get( "https://www.urbanladder.com/" );
+		
+		String Page = driver.getTitle();
+		String File  = "C:\\Users\\Arpith\\Desktop\\Arpit\\";
 		
 		driver.manage().timeouts().implicitlyWait(20,TimeUnit.SECONDS);
 		WebDriverWait W = new WebDriverWait( driver, 20 );
@@ -42,8 +47,12 @@ public class DropDownMenu extends DriverCreation
 
 		// Common Xpath for all dropdown menus
 		String MenusPath = "//ul[@class='topnav bodytext']/li/span";
-		String ListsPath = "/../div/div/ul/li/div/a";
-		String ListItemsPath = "/../div/div/ul/li[j]/ul/li/a/span";
+		
+		// Common Xpath for all Lists inside each dropdown menus
+		String ListsPath = "//div/div/ul/li/div/a";
+		
+		// Common Xpath for all Items inside each list inside each dropdown menus
+		String ListItemsPath = "//div/div/ul/li[j]/ul/li/a/span";
 		
 		// Identifying all DropDown Menus WebElements
 		List<WebElement> Menus = driver.findElements( By.xpath( MenusPath ) );
@@ -62,7 +71,7 @@ public class DropDownMenu extends DriverCreation
 			System.out.print( "\nMenu[" + (i) + "] -> " + Menu.getText() );
 
 			// Gathering all lists as WebElements -> present inside each dropdown menu one-by-one
-			List<WebElement> Lists = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace("li", "li["+ i +"]" ) + ListsPath) );
+			List<WebElement> Lists = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace("li", "li["+ i +"]" ) + "/.." + ListsPath ) );
 			
 			System.out.println( " , Total Lists inside = "+ Lists.size() );
 			
@@ -74,14 +83,18 @@ public class DropDownMenu extends DriverCreation
 				System.out.print( "     List[" + j + "] -> " + Lists.get(j-1).getText() + " , List Items -> [" );
 
 				// Gathering all items as WebElements -> present inside each list one-by-one -> present inside each dropdown menu
-				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "li", "li["+ i +"]" ) + ListItemsPath.replace( "[j]", "["+ j +"]" ) ) );
+				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "li", "li["+ i +"]" ) + "/.." + ListItemsPath.replace( "[j]", "["+ j +"]" ) ) );
 				
 				// Printing all items -> present inside each list -> present inside each dropdown menu as Coloumn values  as Coloumn
 				for( int k = 0 ; k < ListItems.size()-1 ; k++ )
+				{
 					System.out.print( ListItems.get( k ).getText() + "," );
+					Methods.writeData( ListItems.get( k ).getText(), File, Page, Menu.getText(), (k+1) , (j-1) );
+				}
 				
 				// Printing the last item -> present inside each list -> present inside each dropdown menu
 				System.out.println( ListItems.get( ListItems.size()-1 ).getText() + "]" );
+				Methods.writeData( ListItems.get( ListItems.size()-1 ).getText(), File, Page, Menu.getText(), ( ListItems.size() ) , (j-1) );
 			}
 		}
 		
