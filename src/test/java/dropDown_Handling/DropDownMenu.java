@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -28,7 +29,7 @@ public class DropDownMenu extends DriverCreation
 	public static void main( String[] args ) throws EncryptedDocumentException, InvalidFormatException, IOException
 	{
 		DriverCreation DC = new DriverCreation();
-		driver = DC.driver( "chrome" );
+		driver = DC.driver( "firefox" );
 
 		boolean ConsoleEnable = false, WorkbookEnable = true ;
 		DropDownMenu.execute( ConsoleEnable, WorkbookEnable );
@@ -39,9 +40,12 @@ public class DropDownMenu extends DriverCreation
 		driver.manage().window().maximize();
 		driver.get( "https://www.urbanladder.com/" );
 		
-		//String Page = driver.getTitle();
-		String Path  = ".\\target\\";
+		String Page = driver.getTitle();
+		String Path  = ".\\target\\Captured Data\\";
 
+		FileOutputStream FO = new FileOutputStream( Path + Page.replace(':','-') +".xlsx");
+		XSSFWorkbook Wb = new XSSFWorkbook();
+		
 		driver.manage().timeouts().implicitlyWait(20,TimeUnit.SECONDS);
 		WebDriverWait W = new WebDriverWait( driver, 20 );
 		Actions A = new Actions(driver);
@@ -78,36 +82,33 @@ public class DropDownMenu extends DriverCreation
 			
 			// Hovering the cursor on each dropdown menu to make the lists inside visible
 			A.moveToElement( Menu ).perform();
-
-			FileOutputStream FO = new FileOutputStream( Path + Menu.getText() +".xlsx");
-			XSSFWorkbook Wb = new XSSFWorkbook();
-
-			Wb.createSheet( Menu.getText() );
-			XSSFSheet S = null ;
 			
 			// Printing Header text from each dropdown menu one-by-one
 			if( ConsoleEnable )
 				System.out.print( "\nMenu[" + (i) + "] -> " + Menu.getText() );
-			else if( WorkbookEnable )
-			{
-				S= Wb.getSheet( Menu.getText() );
-			}
+
 			// Gathering all lists as WebElements -> present inside each dropdown menu one-by-one
 			List<WebElement> Lists = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace("li", "li["+ i +"]" ) + "/.." + ListsPath ) );
 			
 			if( ConsoleEnable )
 				System.out.println( " , Total Lists inside = "+ Lists.size() );
 
+			Wb.createSheet( Menu.getText() );
+			XSSFSheet S = Wb.getSheet( Menu.getText() );
+			
 			for( int j = 1 ; j <= Lists.size() ; j++ )
 			{	
 				W.until( ExpectedConditions.elementToBeClickable( Lists.get( j-1 ) ) );
-
+				XSSFRow R = S.createRow( j-1 );
+				
 				// Printing the list Headers -> present inside each dropdown menus as Column Headings
 				if(ConsoleEnable)
 					System.out.print( "     List[" + j + "] -> " + Lists.get( j-1 ).getText() );
+				else if( WorkbookEnable )
+					R.createCell( 0 ).setCellValue( Lists.get( j-1 ).getText() +" => " );
 
 				// Gathering all items as WebElements -> present inside each list one-by-one -> present inside each dropdown menu
-				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "li", "li[" + i + "]" ) + "/.." + ListItemsPath.replace( "[j]", "["+j+"]" ) ) );
+				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "li", "li["+i+"]" ) + "/.." + ListItemsPath.replace( "[j]", "["+j+"]" ) ) );
 				if(ConsoleEnable)
 					System.out.print( " , List Items ("+ ListItems.size() +") -> [ " );
 				
@@ -117,21 +118,21 @@ public class DropDownMenu extends DriverCreation
 					if( ConsoleEnable )
 						System.out.print( ( ListItems.get( k ).getText() + ", " ) );
 					else if( WorkbookEnable )
-						S.createRow( k ).createCell( 0 ).setCellValue( ListItems.get( k ).getText() );
+						R.createCell( k+2 ).setCellValue( ListItems.get( k ).getText() );
 				}
 				
 				// Printing the last item -> present inside each list -> present inside each dropdown menu as Column value
 				if( ConsoleEnable )
 					System.out.println( ListItems.get( ListItems.size()-1 ).getText() + " ]" );
 				else if( WorkbookEnable )
-					S.createRow( ListItems.size()-1 ).createCell( 0 ).setCellValue( ListItems.get( ListItems.size()-1 ).getText() );
+					R.createCell( ListItems.size()+1 ).setCellValue( ListItems.get( ListItems.size()-1 ).getText() );
 			}
-			
-			Wb.write(FO);
-			Wb.close();
-			FO.flush();
-			FO.close();
 		}
+		
+		Wb.write(FO);
+		Wb.close();
+		FO.flush();
+		FO.close();
 		
 		driver.close();
 	}
