@@ -31,7 +31,7 @@ public class DropDownMenu extends DriverCreation
 		DriverCreation DC = new DriverCreation();
 		driver = DC.driver( "firefox" );
 
-		boolean ConsoleEnable = false, WorkbookEnable = true ;
+		boolean ConsoleEnable = true, WorkbookEnable = true ;
 		DropDownMenu.execute( ConsoleEnable, WorkbookEnable );
 	}
 	
@@ -50,15 +50,15 @@ public class DropDownMenu extends DriverCreation
 		WebDriverWait W = new WebDriverWait( driver, 20 );
 		Actions A = new Actions(driver);
 
-		// Clicking the Cross symbol for dismiss the head-alert
-		WebElement Cross = driver.findElement(By.xpath("//div[@class='right close-head-alert']/div"));
-		W.until( ExpectedConditions.elementToBeClickable( Cross ) );
-		Cross.click();
-
 		// Clicking the Close symbol for dismiss the banner
 		WebElement Close = driver.findElement( By.xpath( "//a[contains(text(),'Close')]" ) );
 		W.until( ExpectedConditions.elementToBeClickable( Close ) );
 		Close.click();
+
+		// Clicking the Cross symbol for dismiss the head-alert
+		WebElement Cross = driver.findElement(By.xpath("//div[@class='right close-head-alert']/div"));
+		W.until( ExpectedConditions.elementToBeClickable( Cross ) );
+		Cross.click();
 
 		// Common Xpath for all dropdown menus
 		String MenusPath = "//ul[@class='topnav bodytext']/li/span";
@@ -104,7 +104,7 @@ public class DropDownMenu extends DriverCreation
 				// Printing the list Headers -> present inside each dropdown menus as Column Headings
 				if(ConsoleEnable)
 					System.out.print( "     List[" + j + "] -> " + Lists.get( j-1 ).getText() );
-				else if( WorkbookEnable )
+				if( WorkbookEnable )
 					R.createCell( 0 ).setCellValue( Lists.get( j-1 ).getText() +" => " );
 
 				// Gathering all items as WebElements -> present inside each list one-by-one -> present inside each dropdown menu
@@ -117,15 +117,21 @@ public class DropDownMenu extends DriverCreation
 				{
 					if( ConsoleEnable )
 						System.out.print( ( ListItems.get( k ).getText() + ", " ) );
-					else if( WorkbookEnable )
+					if( WorkbookEnable )
+					{
+						W.until(ExpectedConditions.elementToBeClickable(ListItems.get( k )));
 						R.createCell( k+2 ).setCellValue( ListItems.get( k ).getText() );
+					}
 				}
 				
 				// Printing the last item -> present inside each list -> present inside each dropdown menu as Column value
 				if( ConsoleEnable )
 					System.out.println( ListItems.get( ListItems.size()-1 ).getText() + " ]" );
-				else if( WorkbookEnable )
+				if( WorkbookEnable )
+				{
+					W.until(ExpectedConditions.elementToBeClickable(ListItems.get( ListItems.size()-1 )));
 					R.createCell( ListItems.size()+1 ).setCellValue( ListItems.get( ListItems.size()-1 ).getText() );
+				}
 			}
 		}
 		
