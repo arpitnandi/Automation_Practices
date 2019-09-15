@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -50,17 +51,17 @@ public class DropDownMenu extends DriverCreation
 		Cross.click();
 
 		// Common Xpath for all dropdown menus
-		String MenusPath = "//ul[@class='topnav bodytext']/li/span";
+		String MenusPath = "//ul[@class='topnav bodytext']/li[*]/span";
 		
 		// Common Xpath for all Lists inside each dropdown menus
-		String ListsPath = "//div/div/ul/li/div/a";
+		String ListsPath = "//div/div/ul/li[*]/div/a";
 		
 		// Common Xpath for all Items inside each list inside each dropdown menus
-		String ListItemsPath = "//div/div/ul/li[*]/ul/li/a/span";
+		String ListItemsPath = "//ul/li[*]/a/span";
 
-		DropDownMenu.workbook(MenusPath, ListsPath, ListItemsPath);
 		DropDownMenu.console(MenusPath, ListsPath, ListItemsPath);
-
+		DropDownMenu.workbook(MenusPath, ListsPath, ListItemsPath);
+		
 		driver.close();
 	}
 	
@@ -80,7 +81,7 @@ public class DropDownMenu extends DriverCreation
 			System.out.print( "\nMenu[" + (i) + "] -> " + Menus.get(i-1).getText() );
 
 			// Gathering all lists as WebElements -> present inside each dropdown menu one-by-one
-			List<WebElement> Lists = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace("li", "li["+ i +"]" ) + "/.." + ListsPath ) );
+			List<WebElement> Lists = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace("[*]", "["+ i +"]" ) + "/.." + ListsPath ) );
 			
 			System.out.println( " , Total Lists inside = "+ Lists.size() );
 
@@ -92,7 +93,7 @@ public class DropDownMenu extends DriverCreation
 				System.out.print( "     List[" + j + "] -> " + Lists.get( j-1 ).getText() );
 				
 				// Gathering all items as WebElements -> present inside each list one-by-one -> present inside each dropdown menu
-				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "li", "li["+i+"]" ) + "/.." + ListItemsPath.replace( "[*]", "["+j+"]" ) ) );
+				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "[*]", "["+i+"]" ) + "/.." + ListsPath.replace("[*]", "["+ j +"]") + "/../.." + ListItemsPath ) );
 				System.out.print( " , List Items ("+ ListItems.size() +") -> [ " );
 				
 				// Printing all items -> present inside each list -> present inside each dropdown menu as Column values
@@ -122,47 +123,52 @@ public class DropDownMenu extends DriverCreation
 		FileOutputStream FO = new FileOutputStream( Path + Page.replace(':','-') +".xlsx");
 		XSSFWorkbook Wb = new XSSFWorkbook();
 		
-		// Identifying all DropDown Menus WebElements
 		List<WebElement> Menus = driver.findElements( By.xpath( MenusPath ) );
 		
-		for( int i = 1 ; i <= Menus.size() ; i++ )
+		for( int i = 1 ; i <= Menus.size() ; i++ ) // Sheets creating for each Menu
 		{	
-			// Hovering the cursor on each dropdown menu to make the lists inside visible
-			A.moveToElement( Menus.get(i-1) ).perform();
+			A.moveToElement( Menus.get( i-1 )).perform();
 			
-			// Gathering all lists as WebElements -> present inside each dropdown menu one-by-one
-			List<WebElement> Lists = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace("li", "li["+ i +"]" ) + "/.." + ListsPath ) );
-			
-			Wb.createSheet( Menus.get(i-1).getText() );
-			XSSFSheet S = Wb.getSheet( Menus.get(i-1).getText() );
-			
-			for( int j = 1 ; j <= Lists.size() ; j++ )
+			Wb.createSheet( Menus.get( i-1 ).getText() );
+			XSSFSheet S = Wb.getSheet( Menus.get( i-1 ).getText() );
+
+			List<WebElement> Lists = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace("[*]", "["+ i +"]" ) + "/.." + ListsPath ) );
+
+//			int I[] = new int[ Lists.size()+1 ]; 
+//			int J;
+//			
+//			for( int k = 0 ; k <= Lists.size() ; k++ ) // ListItems for each Lists
+//			{
+//				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "[*]", "["+i+"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") + "/../.." + ListItemsPath ) );
+//				I[ k ] = ListItems.size() ;
+//			}
+//			J = DropDownMenu.biggest(I);
+
+			for( int j = 0 ; j <= 25 ; j++ ) // Rows shifts with List Items
 			{	
-				W.until( ExpectedConditions.elementToBeClickable( Lists.get( j-1 ) ) );
-				XSSFRow R = S.createRow( j-1 );
+				XSSFRow R = S.createRow( j );
 				
-				// Printing the list Headers -> present inside each dropdown menus as Column Headings
-				R.createCell( 0 ).setCellValue( Lists.get( j-1 ).getText() +" => " );
-
-				// Gathering all items as WebElements -> present inside each list one-by-one -> present inside each dropdown menu
-				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "li", "li["+i+"]" ) + "/.." + ListItemsPath.replace( "[*]", "["+j+"]" ) ) );
-				
-				for( int k = 0; k < ListItems.size()-1 ; k++ )
+				for( int k = 1 ; k <= Lists.size() ; k++ ) // Columns shifts with Lists
 				{
-					// Hovering the cursor on each dropdown menu to make the lists inside visible
-					A.moveToElement( Menus.get(i-1) ).perform();
+					List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "[*]", "["+i+"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") + "/../.." + ListItemsPath ) );
 					
-					// Printing all items -> present inside each list -> present inside each dropdown menu as Column values
-					W.until(ExpectedConditions.elementToBeClickable(ListItems.get( k )));
-					R.createCell( k+2 ).setCellValue( ListItems.get( k ).getText() );
+					int l = ListItems.size() ;
+					
+					XSSFCell C = R.createCell( k-1 );
+					
+					if( j == 0 )
+					{
+						WebElement List = driver.findElement( By.xpath( MenusPath.replace( "[*]", "["+i+"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") ) );
+						W.until(ExpectedConditions.elementToBeClickable( List ) );
+						R.createCell( 0 ).setCellValue( List.getText() );
+					}
+					if( j >= 1 && j <= l )
+					{
+						WebElement Item = driver.findElement( By.xpath( MenusPath.replace( "[*]", "["+ i +"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") + "/../.." + ListItemsPath.replace( "[*]", "["+j+"]" ) ) );
+						W.until(ExpectedConditions.elementToBeClickable( Item ) );
+						C.setCellValue( Item.getText() );
+					}	
 				}
-
-				// Hovering the cursor on each dropdown menu to make the lists inside visible
-				A.moveToElement( Menus.get(i-1) ).perform();
-				
-				// Printing the last item -> present inside each list -> present inside each dropdown menu as Column value
-				W.until(ExpectedConditions.elementToBeClickable(ListItems.get( ListItems.size()-1 )));
-				R.createCell( ListItems.size()+1 ).setCellValue( ListItems.get( ListItems.size()-1 ).getText() );
 			}
 		}
 		
@@ -170,5 +176,18 @@ public class DropDownMenu extends DriverCreation
 		Wb.close();
 		FO.flush();
 		FO.close();
+	}
+	
+	public static int biggest(int arr[]) 
+	{
+		int biggest = arr[0];
+		
+		for(int i=1;i<=arr.length-1;i++)
+		{
+			if(biggest<arr[i])
+				biggest=arr[i];
+		}
+		
+		return biggest;
 	}
 }
