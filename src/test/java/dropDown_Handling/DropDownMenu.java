@@ -59,7 +59,7 @@ public class DropDownMenu extends DriverCreation
 		// Common Xpath for all Items inside each list inside each dropdown menus
 		String ListItemsPath = "//ul/li[*]/a/span";
 
-		DropDownMenu.console(MenusPath, ListsPath, ListItemsPath);
+		//DropDownMenu.console(MenusPath, ListsPath, ListItemsPath);
 		DropDownMenu.workbook(MenusPath, ListsPath, ListItemsPath);
 		
 		driver.close();
@@ -152,7 +152,12 @@ public class DropDownMenu extends DriverCreation
 				{
 					List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "[*]", "["+i+"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") + "/../.." + ListItemsPath ) );
 					
-					int l = ListItems.size() ;
+					WebElement Item = null;
+					
+					int l = ListItems.size();
+					
+					if( j >= 1 && j <= l )
+						Item= driver.findElement( By.xpath( MenusPath.replace( "[*]", "["+ i +"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") + "/../.." + ListItemsPath.replace( "[*]", "["+j+"]" ) ) );
 					
 					XSSFCell C = R.createCell( k-1 );
 					
@@ -162,9 +167,8 @@ public class DropDownMenu extends DriverCreation
 						W.until(ExpectedConditions.elementToBeClickable( List ) );
 						C.setCellValue( List.getText() );
 					}
-					if( j >= 1 && j <= l )
+					if( j >= 1 && j <= l && Item.isDisplayed() )
 					{
-						WebElement Item = driver.findElement( By.xpath( MenusPath.replace( "[*]", "["+ i +"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") + "/../.." + ListItemsPath.replace( "[*]", "["+j+"]" ) ) );
 						W.until(ExpectedConditions.elementToBeClickable( Item ) );
 						C.setCellValue( Item.getText() );
 					}	
