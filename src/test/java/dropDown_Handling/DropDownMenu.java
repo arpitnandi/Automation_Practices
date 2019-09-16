@@ -134,17 +134,17 @@ public class DropDownMenu extends DriverCreation
 
 			List<WebElement> Lists = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace("[*]", "["+ i +"]" ) + "/.." + ListsPath ) );
 
-//			int I[] = new int[ Lists.size()+1 ]; 
-//			int J;
-//			
-//			for( int k = 0 ; k <= Lists.size() ; k++ ) // ListItems for each Lists
-//			{
-//				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "[*]", "["+i+"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") + "/../.." + ListItemsPath ) );
-//				I[ k ] = ListItems.size() ;
-//			}
-//			J = DropDownMenu.biggest(I);
+			int I[] = new int[ Lists.size()+1 ]; 
+			int J;
+			
+			for( int k = 0 ; k <= Lists.size() ; k++ ) // ListItems for each Lists
+			{
+				List<WebElement> ListItems = ( List<WebElement> )driver.findElements( By.xpath( MenusPath.replace( "[*]", "["+i+"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") + "/../.." + ListItemsPath ) );
+				I[ k ] = ListItems.size() ;
+			}
+			J = DropDownMenu.biggest(I);
 
-			for( int j = 0 ; j <= 25 ; j++ ) // Rows shifts with List Items
+			for( int j = 0 ; j <= J ; j++ ) // Rows shifts with List Items
 			{	
 				XSSFRow R = S.createRow( j );
 				
@@ -160,7 +160,7 @@ public class DropDownMenu extends DriverCreation
 					{
 						WebElement List = driver.findElement( By.xpath( MenusPath.replace( "[*]", "["+i+"]" ) + "/.." + ListsPath.replace("[*]", "["+ k +"]") ) );
 						W.until(ExpectedConditions.elementToBeClickable( List ) );
-						R.createCell( 0 ).setCellValue( List.getText() );
+						C.setCellValue( List.getText() );
 					}
 					if( j >= 1 && j <= l )
 					{
