@@ -1,5 +1,6 @@
 package dropDown_Handling;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -31,7 +32,7 @@ public class DropDownMenu extends DriverCreation
 	public static void main( String[] args ) throws EncryptedDocumentException, InvalidFormatException, IOException
 	{
 		DriverCreation DC = new DriverCreation();
-		driver = DC.driver( "firefox" );
+		driver = DC.driver( "chrome" );
 
 		driver.manage().window().maximize();
 		driver.get( "https://www.urbanladder.com/" );
@@ -118,8 +119,12 @@ public class DropDownMenu extends DriverCreation
 	public static void workbook(String MenusPath, String ListsPath, String ListItemsPath) throws EncryptedDocumentException, InvalidFormatException, IOException 
 	{
 		String Page = driver.getTitle();
-		String Path  = ".\\target\\Captured Data\\";
+		String Path  = ".\\Captured Data\\";
 
+		File F = new File( Path );
+		if( !F.exists() )
+			F.mkdir();
+		
 		FileOutputStream FO = new FileOutputStream( Path + Page.replace(':','-') +".xlsx");
 		XSSFWorkbook Wb = new XSSFWorkbook();
 		
